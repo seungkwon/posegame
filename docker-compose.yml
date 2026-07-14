@@ -1,0 +1,26 @@
+services:
+  db:
+    image: postgres:17
+    container_name: posegame-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: posegame
+      POSTGRES_USER: posegame
+      POSTGRES_PASSWORD: posegame
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql+psycopg://posegame:posegame@db:5432/posegame
+    ports:
+      - "8000:8000"
+
+volumes:
+  postgres_data:
