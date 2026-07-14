@@ -1,12 +1,12 @@
 export const MOTIONS = [
-  { id: 0, key: "neutral", label: "기본 자세", emoji: "•" },
-  { id: 1, key: "both_arms_up", label: "양팔 들기", emoji: "🙌" },
-  { id: 2, key: "left_arm_up", label: "왼팔 들기", emoji: "🫲" },
-  { id: 3, key: "right_arm_up", label: "오른팔 들기", emoji: "🫱" },
-  { id: 4, key: "squat", label: "스쿼트", emoji: "⬇" },
-  { id: 5, key: "lean_left", label: "왼쪽 기울기", emoji: "↙" },
-  { id: 6, key: "lean_right", label: "오른쪽 기울기", emoji: "↘" },
-  { id: 7, key: "jump", label: "점프", emoji: "⤴" }
+  { id: 0, key: "neutral", label: "기본 자세", emoji: "N" },
+  { id: 1, key: "both_arms_up", label: "양팔 들기", emoji: "BA" },
+  { id: 2, key: "left_arm_up", label: "왼팔 들기", emoji: "LA" },
+  { id: 3, key: "right_arm_up", label: "오른팔 들기", emoji: "RA" },
+  { id: 4, key: "squat", label: "스쿼트", emoji: "SQ" },
+  { id: 5, key: "lean_left", label: "왼쪽 기울기", emoji: "LL" },
+  { id: 6, key: "lean_right", label: "오른쪽 기울기", emoji: "LR" },
+  { id: 7, key: "jump", label: "점프", emoji: "JP" }
 ];
 
 const PLAYABLE_MOTION_IDS = [1, 2, 3, 4, 5, 6, 7];
