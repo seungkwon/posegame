@@ -59,6 +59,19 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [poseDetected, setPoseDetected] = useState(false);
   const [previewIndex, setPreviewIndex] = useState(-1);
   const [countdown, setCountdown] = useState(0);
+  const [detectionStatus, setDetectionStatus] = useState("no_pose");
+  const [confidence, setConfidence] = useState(0);
+  const [requiredConfidence, setRequiredConfidence] = useState(0);
+
+  function describeDetectionStatus(status, isConfident) {
+    if (status === "no_pose") return "사람 포즈를 찾는 중입니다.";
+    if (status === "partial_pose") return "전신이 화면 안에 들어오도록 맞춰주세요.";
+    if (status === "neutral_ready") return "기본 자세가 확인되었습니다. 다음 동작을 입력할 수 있습니다.";
+    if (status === "holding") return "동작을 조금 더 분명하게 유지해주세요.";
+    if (status === "motion_ready" && !isConfident) return "동작 후보를 감지했지만 아직 확신도가 낮습니다.";
+    if (status === "motion_ready") return "동작이 안정적으로 감지되고 있습니다.";
+    return "포즈 상태를 확인 중입니다.";
+  }
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -89,10 +102,21 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
           return next.slice(0, targetLengthRef.current);
         });
       },
-      onFrame: ({ fps: nextFps, motionId, poseDetected: nextPoseDetected }) => {
+      onFrame: ({
+        fps: nextFps,
+        motionId,
+        poseDetected: nextPoseDetected,
+        confidence: nextConfidence,
+        requiredConfidence: nextRequiredConfidence,
+        status,
+        isConfident
+      }) => {
         setFps(nextFps);
         setPoseDetected(nextPoseDetected);
         setDetectedMotionId(motionId);
+        setDetectionStatus(describeDetectionStatus(status, isConfident));
+        setConfidence(nextConfidence);
+        setRequiredConfidence(nextRequiredConfidence);
       }
     });
 
@@ -254,6 +278,9 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
             <small>
               동작 확정 기준: 약 {CONFIRMATION_FRAMES}프레임 유지 / 포즈 감지 상태:{" "}
               {poseDetected ? "정상" : "대기"}
+            </small>
+            <small>
+              인식 안내: {detectionStatus} / 신뢰도 {confidence.toFixed(2)} / 기준 {requiredConfidence.toFixed(2)}
             </small>
           </div>
 

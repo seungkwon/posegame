@@ -15,6 +15,16 @@ const LANDMARK = {
 };
 
 const VISIBILITY_THRESHOLD = 0.55;
+const MOTION_CONFIDENCE = {
+  0: 0.55,
+  1: 0.78,
+  2: 0.76,
+  3: 0.76,
+  4: 0.8,
+  5: 0.68,
+  6: 0.68,
+  7: 0.84
+};
 
 function isVisible(point) {
   return point && (point.visibility ?? 1) >= VISIBILITY_THRESHOLD;
@@ -112,7 +122,8 @@ export function createMotionClassifier() {
         motionId: 0,
         confidence: 0,
         landmarks: [],
-        poseDetected: false
+        poseDetected: false,
+        status: "no_pose"
       };
     }
 
@@ -122,7 +133,8 @@ export function createMotionClassifier() {
         motionId: 0,
         confidence: 0.1,
         landmarks,
-        poseDetected: false
+        poseDetected: false,
+        status: "partial_pose"
       };
     }
 
@@ -159,7 +171,7 @@ export function createMotionClassifier() {
       hipLift > baselineState.torsoHeight * 0.22 &&
       ankleLift > baselineState.torsoHeight * 0.12
     ) {
-      return { motionId: 7, confidence: 0.9, landmarks, poseDetected: true };
+      return { motionId: 7, confidence: 0.9, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (
@@ -167,36 +179,39 @@ export function createMotionClassifier() {
       rightKneeAngle < 125 &&
       squatDepth > torsoHeight * 0.95
     ) {
-      return { motionId: 4, confidence: 0.85, landmarks, poseDetected: true };
+      return { motionId: 4, confidence: 0.85, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (leftArmUp && rightArmUp) {
-      return { motionId: 1, confidence: 0.88, landmarks, poseDetected: true };
+      return { motionId: 1, confidence: 0.88, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (leftArmUp && !rightArmUp) {
-      return { motionId: 2, confidence: 0.82, landmarks, poseDetected: true };
+      return { motionId: 2, confidence: 0.82, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (rightArmUp && !leftArmUp) {
-      return { motionId: 3, confidence: 0.82, landmarks, poseDetected: true };
+      return { motionId: 3, confidence: 0.82, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (leanOffset < -shoulderWidth * 0.2) {
-      return { motionId: 5, confidence: 0.72, landmarks, poseDetected: true };
+      return { motionId: 5, confidence: 0.72, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (leanOffset > shoulderWidth * 0.2) {
-      return { motionId: 6, confidence: 0.72, landmarks, poseDetected: true };
+      return { motionId: 6, confidence: 0.72, landmarks, poseDetected: true, status: "motion_ready" };
     }
+
+    const shouldReset = likelyNeutral && baselineState.ready;
 
     return {
       motionId: 0,
       confidence: likelyNeutral ? 0.75 : 0.35,
       landmarks,
-      poseDetected: true
+      poseDetected: true,
+      status: shouldReset ? "neutral_ready" : "holding"
     };
   }
 
-  return { classify };
+  return { classify, motionConfidence: MOTION_CONFIDENCE };
 }

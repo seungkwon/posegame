@@ -9,6 +9,7 @@ import { createMotionClassifier } from "./poseClassifier";
 const HOLD_TIME_MS = 350;
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
 const LANDMARK_RADIUS = 4;
+const MOTION_COOLDOWN_MS = 650;
 
 const POSE_CONNECTIONS = [
   [11, 12],
@@ -103,6 +104,7 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
   let activeMotionId = 0;
   let previousMotionId = 0;
   let stableSince = performance.now();
+  let lastAcceptedAt = 0;
   let webcamStream = null;
   let animationFrameId = 0;
   let lastProcessedAt = 0;
@@ -149,6 +151,8 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
       const result = poseLandmarker.detectForVideo(videoElement, now);
       const landmarks = result.landmarks?.[0] ?? [];
       const classification = classifier.classify(landmarks);
+      const requiredConfidence = classifier.motionConfidence[classification.motionId] ?? 0.7;
+      const isConfident = classification.confidence >= requiredConfidence;
 
       if (context && canvasElement && classification.poseDetected) {
         drawPose(context, canvasElement, landmarks);
@@ -163,7 +167,7 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
         context.restore();
       }
 
-      if (classification.poseDetected) {
+      if (classification.poseDetected && isConfident) {
         pushDetectedMotion(classification.motionId, now);
       }
 
@@ -178,7 +182,11 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
       onFrame?.({
         fps,
         motionId: classification.motionId,
-        poseDetected: classification.poseDetected
+        poseDetected: classification.poseDetected,
+        confidence: classification.confidence,
+        requiredConfidence,
+        status: classification.status,
+        isConfident
       });
     };
 
@@ -196,6 +204,10 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
   }
 
   function pushDetectedMotion(motionId, now = performance.now()) {
+    if (motionId !== 0 && now - lastAcceptedAt < MOTION_COOLDOWN_MS) {
+      return;
+    }
+
     if (motionId !== previousMotionId) {
       previousMotionId = motionId;
       stableSince = now;
@@ -208,6 +220,9 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
 
     if (now - stableSince >= HOLD_TIME_MS) {
       activeMotionId = motionId;
+      if (motionId !== 0) {
+        lastAcceptedAt = now;
+      }
       onStableMotion({
         motionId,
         motion: getMotionById(motionId),
