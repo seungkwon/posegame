@@ -11,15 +11,27 @@ import {
 } from "../lib/game";
 import { createPoseEngine } from "../lib/poseEngine";
 
-function SequenceChips({ title, sequence }) {
+const PREVIEW_MOTION_MS = 1100;
+const PREVIEW_GAP_MS = 250;
+const COUNTDOWN_START = 3;
+
+function SequenceChips({ title, sequence, activeIndex = -1, completedCount = 0 }) {
   return (
     <div className="sequence-block">
       <p className="sequence-title">{title}</p>
       <div className="sequence-list">
         {sequence.map((motionId, index) => {
           const motion = getMotionById(motionId);
+          const classNames = [
+            "sequence-chip",
+            index === activeIndex ? "active" : "",
+            index < completedCount ? "done" : ""
+          ]
+            .filter(Boolean)
+            .join(" ");
+
           return (
-            <span className="sequence-chip" key={`${title}-${index}-${motionId}`}>
+            <span className={classNames} key={`${title}-${index}-${motionId}`}>
               {motion.emoji} {motion.label}
             </span>
           );
@@ -35,6 +47,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const poseEngineRef = useRef(null);
   const phaseRef = useRef("ready");
   const targetLengthRef = useRef(0);
+  const roundSequenceRef = useRef([]);
   const [level, setLevel] = useState(1);
   const [targetSequence, setTargetSequence] = useState(() => generateTargetSequence(1));
   const [playerSequence, setPlayerSequence] = useState([]);
@@ -44,6 +57,8 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [fps, setFps] = useState(TARGET_FPS);
   const [cameraReady, setCameraReady] = useState(false);
   const [poseDetected, setPoseDetected] = useState(false);
+  const [previewIndex, setPreviewIndex] = useState(-1);
+  const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
     phaseRef.current = phase;
@@ -89,6 +104,55 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   }, []);
 
   useEffect(() => {
+    if (phase !== "preview") {
+      return undefined;
+    }
+
+    const sequence = roundSequenceRef.current;
+    setPreviewIndex(0);
+    setMessage("목표 시퀀스를 잘 보고 기억하세요.");
+
+    let currentIndex = 0;
+    const intervalId = window.setInterval(() => {
+      currentIndex += 1;
+      if (currentIndex >= sequence.length) {
+        window.clearInterval(intervalId);
+        setPreviewIndex(-1);
+        setCountdown(COUNTDOWN_START);
+        setPhase("countdown");
+        setMessage("곧 따라 하기 단계가 시작됩니다.");
+        return;
+      }
+
+      setPreviewIndex(currentIndex);
+    }, PREVIEW_MOTION_MS + PREVIEW_GAP_MS);
+
+    return () => {
+      window.clearInterval(intervalId);
+    };
+  }, [phase]);
+
+  useEffect(() => {
+    if (phase !== "countdown") {
+      return undefined;
+    }
+
+    if (countdown <= 0) {
+      setPhase("playing");
+      setMessage("이제 자세를 순서대로 따라 해보세요.");
+      return undefined;
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setCountdown((current) => current - 1);
+    }, 1000);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [countdown, phase]);
+
+  useEffect(() => {
     if (playerSequence.length === 0 || playerSequence.length < targetSequence.length) {
       return;
     }
@@ -112,18 +176,21 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
     try {
       await poseEngineRef.current.startCamera(videoRef.current, overlayRef.current);
       setCameraReady(true);
-      setMessage("카메라가 연결되었습니다. 정면에 서서 기본 자세를 먼저 잡아주세요.");
+      setMessage("카메라가 연결되었습니다. 정면에서 기본 자세를 먼저 잡아주세요.");
     } catch (error) {
       setMessage("카메라 권한 또는 MediaPipe 로딩 상태를 확인해주세요.");
     }
   }
 
   function startRound(nextLevel = level) {
+    const nextSequence = generateTargetSequence(nextLevel);
+    roundSequenceRef.current = nextSequence;
     setLevel(nextLevel);
-    setTargetSequence(generateTargetSequence(nextLevel));
+    setTargetSequence(nextSequence);
     setPlayerSequence([]);
-    setPhase("playing");
-    setMessage("화면의 목표 시퀀스를 확인하고 자세를 차례대로 따라 해보세요.");
+    setPreviewIndex(-1);
+    setCountdown(0);
+    setPhase("preview");
   }
 
   function goNextLevel() {
@@ -161,8 +228,25 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
             <div className={`fps-badge ${fps < MIN_FPS ? "warning" : ""}`}>Pose {fps} FPS</div>
           </div>
 
-          <SequenceChips title="목표 시퀀스" sequence={targetSequence} />
-          <SequenceChips title="사용자 시퀀스" sequence={playerSequence} />
+          <SequenceChips
+            activeIndex={previewIndex}
+            completedCount={phase === "playing" || phase === "result" ? playerSequence.length : 0}
+            sequence={targetSequence}
+            title="목표 시퀀스"
+          />
+          <SequenceChips completedCount={playerSequence.length} sequence={playerSequence} title="사용자 시퀀스" />
+
+          <div className="progress-row">
+            <div className="progress-copy">
+              <strong>
+                진행률 {playerSequence.length} / {targetSequence.length}
+              </strong>
+              <span>{phase === "preview" ? "보기 단계" : phase === "countdown" ? "준비 단계" : "입력 단계"}</span>
+            </div>
+            <div className="progress-bar">
+              <span style={{ width: `${(playerSequence.length / Math.max(1, targetSequence.length)) * 100}%` }} />
+            </div>
+          </div>
 
           <div className={`status-banner phase-${phase}`}>
             <strong>{getMotionById(detectedMotionId).label}</strong>
@@ -172,6 +256,13 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
               {poseDetected ? "정상" : "대기"}
             </small>
           </div>
+
+          {phase === "countdown" ? (
+            <div className="countdown-card">
+              <p>준비</p>
+              <strong>{countdown}</strong>
+            </div>
+          ) : null}
 
           <div className="action-row">
             {!cameraReady ? (
@@ -204,6 +295,12 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
           <div className="camera-stack">
             <video className="camera-view" muted playsInline ref={videoRef} />
             <canvas className="camera-overlay" ref={overlayRef} />
+            {phase === "preview" && previewIndex >= 0 ? (
+              <div className="preview-overlay">
+                <span>기억하기</span>
+                <strong>{getMotionById(targetSequence[previewIndex]).label}</strong>
+              </div>
+            ) : null}
           </div>
 
           <div className="demo-controls">
