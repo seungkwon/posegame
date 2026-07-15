@@ -52,9 +52,19 @@
   - Documented the smoke-test commands in `README.md`.
   - Verified `npm run smoke`, `npm run build`, and `py -3.9 -m unittest tests.test_smoke`.
 
+## Milestone 10. Add a one-command verification workflow
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added a top-level `verify.ps1` script that runs frontend smoke checks, frontend build, and backend smoke tests.
+  - Added `-FrontendOnly` and `-BackendOnly` options for narrower verification runs.
+  - Updated `README.md` to document the one-command workflow and the Python 3.9 backend test command.
+  - Verified the full root command with `powershell -ExecutionPolicy Bypass -File .\verify.ps1`.
+
 ## Next milestone
 
-- Milestone 10. Add a one-command verification workflow
+- Milestone 11. Add developer environment bootstrap notes
 - Goal:
-  - Provide a simple top-level command or script for common milestone checks.
-  - Reduce friction when running frontend and backend verification together.
+  - Reduce setup friction for Python and Node version alignment.
+  - Document the verification prerequisites discovered during smoke-test setup.

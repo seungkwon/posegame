@@ -22,6 +22,17 @@ Persistence is PostgreSQL via Docker.
 
 ## Run
 
+### One-command verification
+
+```powershell
+./verify.ps1
+```
+
+Optional flags:
+
+- `./verify.ps1 -FrontendOnly`
+- `./verify.ps1 -BackendOnly`
+
 ### Backend
 
 ```bash
@@ -37,7 +48,7 @@ uvicorn app.main:app --reload
 
 ```bash
 cd backend
-python -m unittest tests.test_smoke
+py -3.9 -m unittest tests.test_smoke
 ```
 
 ### Docker
@@ -71,3 +82,4 @@ npm run build
 ## Documents
 
 - Open resource attribution: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
+- Progress log: [`Progress.md`](Progress.md)
