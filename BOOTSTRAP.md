@@ -69,6 +69,10 @@ cd backend
 py -3.9 -m unittest tests.test_smoke
 ```
 
+### Backend sanity check by hand
+
+Follow [`API_QUICKSTART.md`](API_QUICKSTART.md) if you want to confirm the live API flow manually after the backend starts.
+
 ## Troubleshooting
 
 - If backend imports fail with missing `fastapi` or `starlette`, check that you installed requirements for the same Python version you are using to run tests.

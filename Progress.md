@@ -80,9 +80,18 @@
   - Added `SETUP_CHECKLIST.md` covering backend, frontend, and verification startup steps.
   - Updated `README.md` and `BOOTSTRAP.md` to link the new checklist and clarify `.env` expectations.
 
+## Milestone 13. Add backend health and local API quickstart notes
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added `API_QUICKSTART.md` with a short local backend sanity-check flow covering database startup, `/health`, login, result save, and history fetch.
+  - Updated `README.md`, `SETUP_CHECKLIST.md`, and `BOOTSTRAP.md` to link the quickstart in the right onboarding spots.
+  - Clarified the fastest manual path to confirm backend health after local startup.
+
 ## Next milestone
 
-- Milestone 13. Add backend health and local API quickstart notes
+- Milestone 14. Add frontend local quickstart and camera readiness notes
 - Goal:
-  - Make the API startup and sanity-check sequence easier to follow.
-  - Document the smallest set of commands needed to confirm the backend is healthy.
+  - Make frontend bring-up and webcam prerequisites easier to verify.
+  - Reduce first-run confusion around camera permissions and MediaPipe startup.

@@ -14,6 +14,7 @@ Use this checklist when bringing up the project on a new machine or after resett
 - If you use Docker for the database, start it with `docker compose up db -d`
 - Start the backend with `uvicorn app.main:app --reload` from `backend`
 - Confirm the API is reachable at `http://localhost:8000/health`
+- Optionally run through [`API_QUICKSTART.md`](API_QUICKSTART.md) to verify login, save, and history endpoints end to end
 
 ## Frontend checklist
 

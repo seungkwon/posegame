@@ -57,6 +57,17 @@ cd backend
 py -3.9 -m unittest tests.test_smoke
 ```
 
+### Backend API quickstart
+
+See [`API_QUICKSTART.md`](API_QUICKSTART.md) for the shortest local path to:
+
+- start only the database
+- launch the backend
+- verify `/health`
+- create a sample user
+- save a sample result
+- fetch history
+
 ### Docker
 
 ```bash
@@ -91,3 +102,4 @@ npm run build
 - Progress log: [`Progress.md`](Progress.md)
 - Developer bootstrap: [`BOOTSTRAP.md`](BOOTSTRAP.md)
 - Setup checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)
+- API quickstart: [`API_QUICKSTART.md`](API_QUICKSTART.md)
