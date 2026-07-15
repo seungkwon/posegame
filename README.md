@@ -37,9 +37,9 @@ Optional flags:
 
 ```bash
 cd backend
-python -m venv .venv
+py -3.9 -m venv .venv
 .venv\Scripts\activate
-pip install -r requirements.txt
+py -3.9 -m pip install -r requirements.txt
 copy .env.example .env
 uvicorn app.main:app --reload
 ```
@@ -83,3 +83,4 @@ npm run build
 
 - Open resource attribution: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
 - Progress log: [`Progress.md`](Progress.md)
+- Developer bootstrap: [`BOOTSTRAP.md`](BOOTSTRAP.md)

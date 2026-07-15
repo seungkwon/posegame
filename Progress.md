@@ -62,9 +62,18 @@
   - Updated `README.md` to document the one-command workflow and the Python 3.9 backend test command.
   - Verified the full root command with `powershell -ExecutionPolicy Bypass -File .\verify.ps1`.
 
+## Milestone 11. Add developer environment bootstrap notes
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added `BOOTSTRAP.md` with recommended toolchain, first-time setup, verification commands, and troubleshooting notes.
+  - Documented the Python 3.9 requirement for backend smoke-test consistency.
+  - Updated `README.md` to link the bootstrap guide and align backend setup commands with the tested interpreter.
+
 ## Next milestone
 
-- Milestone 11. Add developer environment bootstrap notes
+- Milestone 12. Add API environment example and setup checklist
 - Goal:
-  - Reduce setup friction for Python and Node version alignment.
-  - Document the verification prerequisites discovered during smoke-test setup.
+  - Make backend startup requirements more explicit for new contributors.
+  - Reduce ambiguity around `.env` creation and local database expectations.
