@@ -64,6 +64,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [confidence, setConfidence] = useState(0);
   const [requiredConfidence, setRequiredConfidence] = useState(0);
   const [diagnostics, setDiagnostics] = useState(null);
+  const [readyForNextInput, setReadyForNextInput] = useState(true);
 
   function describeDetectionStatus(status, isConfident) {
     if (status === "no_pose") return "Looking for a full body pose.";
@@ -113,7 +114,8 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         requiredConfidence: nextRequiredConfidence,
         status,
         isConfident,
-        diagnostics: nextDiagnostics
+        diagnostics: nextDiagnostics,
+        readyForNextInput: nextReadyForNextInput
       }) => {
         setFps(nextFps);
         setPoseDetected(nextPoseDetected);
@@ -122,6 +124,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         setConfidence(nextConfidence);
         setRequiredConfidence(nextRequiredConfidence);
         setDiagnostics(nextDiagnostics);
+        setReadyForNextInput(nextReadyForNextInput);
       }
     });
 
@@ -304,6 +307,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
               Status: {detectionStatus} / Confidence {confidence.toFixed(2)} / Threshold{" "}
               {requiredConfidence.toFixed(2)}
             </small>
+            <small>Input gate: {readyForNextInput ? "Ready for next move" : "Return to neutral to unlock"}</small>
           </div>
 
           <div className="tuning-card">

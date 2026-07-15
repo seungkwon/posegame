@@ -32,9 +32,19 @@
   - Exposed the threshold snapshot in the game UI to support playtest calibration.
   - Verified the frontend build with `npm run build`.
 
+## Milestone 8. Improve consistency of neutral resets and repeated inputs
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added an explicit neutral-reset gate after accepted motions to reduce accidental duplicate inputs.
+  - Required a short stable neutral hold before unlocking the next action.
+  - Exposed the input-gate state in the gameplay status panel.
+  - Verified the frontend build with `npm run build`.
+
 ## Next milestone
 
-- Milestone 8. Improve consistency of neutral resets and repeated inputs
+- Milestone 9. Add backend and frontend smoke-test coverage
 - Goal:
-  - Prevent accidental duplicate entries around pose transitions.
-  - Make reset timing more forgiving when players return to neutral between actions.
+  - Add lightweight automated checks for game flow and API contract regressions.
+  - Make milestone verification less dependent on manual browser checks.

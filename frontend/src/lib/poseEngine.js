@@ -7,6 +7,7 @@ import { getMotionById, TARGET_FPS } from "./game";
 import { createMotionClassifier } from "./poseClassifier";
 
 const HOLD_TIME_MS = 350;
+const NEUTRAL_RESET_HOLD_MS = 220;
 const FRAME_INTERVAL_MS = 1000 / TARGET_FPS;
 const LANDMARK_RADIUS = 4;
 const MOTION_COOLDOWN_MS = 650;
@@ -105,6 +106,7 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
   let previousMotionId = 0;
   let stableSince = performance.now();
   let lastAcceptedAt = 0;
+  let awaitingNeutralReset = false;
   let webcamStream = null;
   let animationFrameId = 0;
   let lastProcessedAt = 0;
@@ -187,7 +189,8 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
         requiredConfidence,
         status: classification.status,
         isConfident,
-        diagnostics: classification.diagnostics
+        diagnostics: classification.diagnostics,
+        readyForNextInput: !awaitingNeutralReset
       });
     };
 
@@ -205,13 +208,30 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
   }
 
   function pushDetectedMotion(motionId, now = performance.now()) {
-    if (motionId !== 0 && now - lastAcceptedAt < MOTION_COOLDOWN_MS) {
-      return;
-    }
-
     if (motionId !== previousMotionId) {
       previousMotionId = motionId;
       stableSince = now;
+      return;
+    }
+
+    if (motionId === 0) {
+      if (!awaitingNeutralReset) {
+        activeMotionId = 0;
+        return;
+      }
+
+      if (now - stableSince >= NEUTRAL_RESET_HOLD_MS) {
+        awaitingNeutralReset = false;
+        activeMotionId = 0;
+      }
+      return;
+    }
+
+    if (awaitingNeutralReset) {
+      return;
+    }
+
+    if (now - lastAcceptedAt < MOTION_COOLDOWN_MS) {
       return;
     }
 
@@ -221,9 +241,8 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
 
     if (now - stableSince >= HOLD_TIME_MS) {
       activeMotionId = motionId;
-      if (motionId !== 0) {
-        lastAcceptedAt = now;
-      }
+      lastAcceptedAt = now;
+      awaitingNeutralReset = true;
       onStableMotion({
         motionId,
         motion: getMotionById(motionId),
