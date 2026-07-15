@@ -1,20 +1,20 @@
 export const OPEN_RESOURCE_POLICY = {
-  summary: "게임 리소스는 오픈 라이선스 자산만 사용합니다.",
+  summary: "This project only adopts assets with clear, reusable open licenses.",
   candidates: [
     {
       name: "Lucide Icons",
       license: "ISC",
-      usage: "UI 아이콘"
+      usage: "UI icons for future navigation or status affordances."
     },
     {
       name: "Google Fonts",
-      license: "OFL or Apache-2.0 by family",
-      usage: "웹폰트"
+      license: "OFL or Apache-2.0 depending on the selected family",
+      usage: "Optional web font sourcing."
     },
     {
       name: "OpenGameArt",
-      license: "자산별 상이",
-      usage: "효과음, 간단한 배경"
+      license: "Varies by asset",
+      usage: "Candidate source for optional stage art, sound, or background assets."
     }
   ]
 };

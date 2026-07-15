@@ -53,7 +53,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [playerSequence, setPlayerSequence] = useState([]);
   const [phase, setPhase] = useState("ready");
   const [detectedMotionId, setDetectedMotionId] = useState(0);
-  const [message, setMessage] = useState("카메라를 연결한 뒤 시작하세요.");
+  const [message, setMessage] = useState("Connect the camera to begin.");
   const [fps, setFps] = useState(TARGET_FPS);
   const [cameraReady, setCameraReady] = useState(false);
   const [poseDetected, setPoseDetected] = useState(false);
@@ -64,13 +64,13 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [requiredConfidence, setRequiredConfidence] = useState(0);
 
   function describeDetectionStatus(status, isConfident) {
-    if (status === "no_pose") return "사람 포즈를 찾는 중입니다.";
-    if (status === "partial_pose") return "전신이 화면 안에 들어오도록 맞춰주세요.";
-    if (status === "neutral_ready") return "기본 자세가 확인되었습니다. 다음 동작을 입력할 수 있습니다.";
-    if (status === "holding") return "동작을 조금 더 분명하게 유지해주세요.";
-    if (status === "motion_ready" && !isConfident) return "동작 후보를 감지했지만 아직 확신도가 낮습니다.";
-    if (status === "motion_ready") return "동작이 안정적으로 감지되고 있습니다.";
-    return "포즈 상태를 확인 중입니다.";
+    if (status === "no_pose") return "Looking for a full body pose.";
+    if (status === "partial_pose") return "Move fully into frame so the camera can see your body.";
+    if (status === "neutral_ready") return "Neutral pose confirmed. You can enter the next move.";
+    if (status === "holding") return "Hold the pose a little longer for a stable read.";
+    if (status === "motion_ready" && !isConfident) return "Motion detected, but confidence is still building.";
+    if (status === "motion_ready") return "Motion confirmed with stable confidence.";
+    return "Checking pose status.";
   }
 
   useEffect(() => {
@@ -134,7 +134,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
 
     const sequence = roundSequenceRef.current;
     setPreviewIndex(0);
-    setMessage("목표 시퀀스를 잘 보고 기억하세요.");
+    setMessage("Watch the target sequence and memorize it.");
 
     let currentIndex = 0;
     const intervalId = window.setInterval(() => {
@@ -144,7 +144,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         setPreviewIndex(-1);
         setCountdown(COUNTDOWN_START);
         setPhase("countdown");
-        setMessage("곧 따라 하기 단계가 시작됩니다.");
+        setMessage("Get ready. Input starts after the countdown.");
         return;
       }
 
@@ -163,7 +163,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
 
     if (countdown <= 0) {
       setPhase("playing");
-      setMessage("이제 자세를 순서대로 따라 해보세요.");
+      setMessage("Now perform the poses in order.");
       return undefined;
     }
 
@@ -185,7 +185,11 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
     const score = buildScore(level, success);
 
     setPhase("result");
-    setMessage(success ? "정답입니다. 다음 레벨로 진행할 수 있어요." : "순서가 맞지 않았습니다. 다시 도전해보세요.");
+    setMessage(
+      success
+        ? "Correct sequence. You are ready for the next level."
+        : "The sequence did not match. Try the round again."
+    );
 
     onSaveResult({
       level,
@@ -200,9 +204,9 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
     try {
       await poseEngineRef.current.startCamera(videoRef.current, overlayRef.current);
       setCameraReady(true);
-      setMessage("카메라가 연결되었습니다. 정면에서 기본 자세를 먼저 잡아주세요.");
+      setMessage("Camera connected. Stand in a neutral pose facing the camera.");
     } catch (error) {
-      setMessage("카메라 권한 또는 MediaPipe 로딩 상태를 확인해주세요.");
+      setMessage("Check camera permission and MediaPipe loading state, then try again.");
     }
   }
 
@@ -234,10 +238,10 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         </div>
         <div className="topbar-actions">
           <button className="ghost-button" onClick={onShowHistory} type="button">
-            마이페이지
+            History
           </button>
           <button className="ghost-button" onClick={onLogout} type="button">
-            로그아웃
+            Logout
           </button>
         </div>
       </div>
@@ -247,7 +251,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
           <div className="panel-header">
             <div>
               <p className="eyebrow">Stage</p>
-              <h3>레벨 {level}</h3>
+              <h3>Level {level}</h3>
             </div>
             <div className={`fps-badge ${fps < MIN_FPS ? "warning" : ""}`}>Pose {fps} FPS</div>
           </div>
@@ -256,16 +260,28 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
             activeIndex={previewIndex}
             completedCount={phase === "playing" || phase === "result" ? playerSequence.length : 0}
             sequence={targetSequence}
-            title="목표 시퀀스"
+            title="Target Sequence"
           />
-          <SequenceChips completedCount={playerSequence.length} sequence={playerSequence} title="사용자 시퀀스" />
+          <SequenceChips
+            completedCount={playerSequence.length}
+            sequence={playerSequence}
+            title="Player Sequence"
+          />
 
           <div className="progress-row">
             <div className="progress-copy">
               <strong>
-                진행률 {playerSequence.length} / {targetSequence.length}
+                Progress {playerSequence.length} / {targetSequence.length}
               </strong>
-              <span>{phase === "preview" ? "보기 단계" : phase === "countdown" ? "준비 단계" : "입력 단계"}</span>
+              <span>
+                {phase === "preview"
+                  ? "Preview"
+                  : phase === "countdown"
+                    ? "Countdown"
+                    : phase === "result"
+                      ? "Result"
+                      : "Input"}
+              </span>
             </div>
             <div className="progress-bar">
               <span style={{ width: `${(playerSequence.length / Math.max(1, targetSequence.length)) * 100}%` }} />
@@ -276,17 +292,18 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
             <strong>{getMotionById(detectedMotionId).label}</strong>
             <span>{message}</span>
             <small>
-              동작 확정 기준: 약 {CONFIRMATION_FRAMES}프레임 유지 / 포즈 감지 상태:{" "}
-              {poseDetected ? "정상" : "대기"}
+              Confirmation target: {CONFIRMATION_FRAMES} stable frames / Pose state:{" "}
+              {poseDetected ? "Detected" : "Waiting"}
             </small>
             <small>
-              인식 안내: {detectionStatus} / 신뢰도 {confidence.toFixed(2)} / 기준 {requiredConfidence.toFixed(2)}
+              Status: {detectionStatus} / Confidence {confidence.toFixed(2)} / Threshold{" "}
+              {requiredConfidence.toFixed(2)}
             </small>
           </div>
 
           {phase === "countdown" ? (
             <div className="countdown-card">
-              <p>준비</p>
+              <p>Ready</p>
               <strong>{countdown}</strong>
             </div>
           ) : null}
@@ -294,17 +311,17 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
           <div className="action-row">
             {!cameraReady ? (
               <button onClick={handleCameraStart} type="button">
-                카메라 연결
+                Connect Camera
               </button>
             ) : (
               <button onClick={() => startRound(level)} type="button">
-                라운드 시작
+                Start Round
               </button>
             )}
 
             {phase === "result" ? (
               <button className="accent-button" onClick={goNextLevel} type="button">
-                다음 레벨
+                Next Level
               </button>
             ) : null}
           </div>
@@ -314,9 +331,9 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
           <div className="panel-header">
             <div>
               <p className="eyebrow">Camera</p>
-              <h3>실시간 포즈 미리보기</h3>
+              <h3>Live Pose Preview</h3>
             </div>
-            <span className="tag">MediaPipe 실시간 추론</span>
+            <span className="tag">MediaPipe realtime tracking</span>
           </div>
 
           <div className="camera-stack">
@@ -324,7 +341,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
             <canvas className="camera-overlay" ref={overlayRef} />
             {phase === "preview" && previewIndex >= 0 ? (
               <div className="preview-overlay">
-                <span>기억하기</span>
+                <span>Memorize</span>
                 <strong>{getMotionById(targetSequence[previewIndex]).label}</strong>
               </div>
             ) : null}
@@ -332,8 +349,8 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
 
           <div className="demo-controls">
             <p>
-              MediaPipe 추론 결과를 화면에 바로 오버레이합니다. 아래 버튼은 테스트나 디버깅을 위한 수동 입력
-              보조입니다.
+              Detected motion is shown live. The buttons below are a manual fallback for quick tests
+              or demos when you do not want to use the camera.
             </p>
             <div className="demo-grid">
               {MOTIONS.map((motion) => (

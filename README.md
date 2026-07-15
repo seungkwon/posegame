@@ -18,6 +18,7 @@ Persistence is PostgreSQL via Docker.
 - Rule-based motion classification
 - Canvas pose overlay
 - Real-time FPS display
+- Open resource attribution document
 
 ## Run
 
@@ -51,4 +52,7 @@ npm run dev
 - Tune motion thresholds for real users
 - Improve jump and squat stability
 - Add richer stage presentation animations
-- Add open resource attribution document
+
+## Documents
+
+- Open resource attribution: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)

@@ -96,7 +96,7 @@ function drawPose(context, canvas, landmarks) {
 
   context.save();
   context.fillStyle = "rgba(19, 34, 56, 0.85)";
-  context.fillRect(0, canvas.height - 40, 220, 40);
+  context.fillRect(0, canvas.height - 40, 260, 40);
   context.restore();
 }
 
@@ -160,7 +160,7 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
         context.fillStyle = "#ffffff";
         context.font = "600 16px Segoe UI";
         context.fillText(
-          `감지 동작: ${getMotionById(classification.motionId).label}`,
+          `Detected motion: ${getMotionById(classification.motionId).label}`,
           16,
           canvasElement.height - 14
         );
