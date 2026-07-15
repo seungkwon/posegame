@@ -125,9 +125,18 @@
   - Replaced the unreadable legacy `계획.md` with a clearer project plan and implementation summary.
   - Preserved the same high-level intent while making both files maintainable for future updates.
 
+## Milestone 18. Normalize revision and legacy note docs
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Rewrote `revision.md` into a cleaner phase-based summary that matches the current implementation history.
+  - Made `Progress.md` the explicit detailed milestone source of truth and `revision.md` the compact companion log.
+  - Reduced the remaining dependency on encoding-sensitive legacy note viewing.
+
 ## Next milestone
 
-- Milestone 18. Normalize revision and legacy note docs
+- Milestone 19. Review repository housekeeping opportunities
 - Goal:
-  - Review `revision.md` and any remaining older notes for consistency with the current documentation structure.
-  - Reduce the number of legacy files that still depend on encoding-sensitive viewing.
+  - Identify any low-risk cleanup work that improves maintainability without changing behavior.
+  - Leave a short prioritized list or complete an obvious cleanup if it is small enough.
