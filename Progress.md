@@ -21,9 +21,20 @@
   - Added a calibration status message in the game UI.
   - Verified the frontend build with `npm run build`.
 
+## Milestone 7. Tune motion thresholds for real users
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Moved pose classification magic numbers into named per-motion threshold settings.
+  - Slightly tightened lean confidence handling for left and right tilt detection.
+  - Added live tuning diagnostics for baseline frames, knee angles, lean ratio, and confidence.
+  - Exposed the threshold snapshot in the game UI to support playtest calibration.
+  - Verified the frontend build with `npm run build`.
+
 ## Next milestone
 
-- Milestone 7. Tune motion thresholds for real users
+- Milestone 8. Improve consistency of neutral resets and repeated inputs
 - Goal:
-  - Adjust per-motion confidence and threshold values based on live play feedback.
-  - Improve consistency across arm raises, leans, and neutral resets.
+  - Prevent accidental duplicate entries around pose transitions.
+  - Make reset timing more forgiving when players return to neutral between actions.

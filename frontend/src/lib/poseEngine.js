@@ -186,7 +186,8 @@ export function createPoseEngine({ onStableMotion, onFrame }) {
         confidence: classification.confidence,
         requiredConfidence,
         status: classification.status,
-        isConfident
+        isConfident,
+        diagnostics: classification.diagnostics
       });
     };
 

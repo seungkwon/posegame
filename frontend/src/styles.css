@@ -143,11 +143,25 @@ input {
 
 .sequence-block,
 .status-banner,
+.tuning-card,
 .demo-controls,
 .history-card {
   background: rgba(255, 255, 255, 0.58);
   border-radius: 20px;
   padding: 16px;
+}
+
+.tuning-card {
+  display: grid;
+  gap: 14px;
+}
+
+.tuning-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  color: #39526d;
+  font-size: 0.95rem;
 }
 
 .sequence-title {

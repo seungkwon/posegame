@@ -16,14 +16,43 @@ const LANDMARK = {
 
 const VISIBILITY_THRESHOLD = 0.55;
 const BASELINE_NEUTRAL_FRAMES = 6;
+
+export const MOTION_THRESHOLDS = {
+  neutral: {
+    kneeMinAngle: 145,
+    leanLimitFactor: 0.12
+  },
+  arms: {
+    wristLiftFactor: 0.16,
+    elbowLiftFactor: 0.12
+  },
+  lean: {
+    triggerFactor: 0.18,
+    commitFactor: 0.2
+  },
+  jump: {
+    kneeMinAngle: 150,
+    leanLimitFactor: 0.18,
+    shoulderLiftFactor: 0.1,
+    hipLiftFactor: 0.16,
+    ankleLiftFactor: 0.08
+  },
+  squat: {
+    kneeMaxAngle: 118,
+    hipDropFactor: 0.14,
+    ankleDropFactor: 0.08,
+    leanLimitFactor: 0.22
+  }
+};
+
 const MOTION_CONFIDENCE = {
   0: 0.55,
   1: 0.78,
   2: 0.76,
   3: 0.76,
   4: 0.82,
-  5: 0.68,
-  6: 0.68,
+  5: 0.7,
+  6: 0.7,
   7: 0.88
 };
 
@@ -119,6 +148,24 @@ function resetNeutralFrames(baselineState) {
   baselineState.neutralFrames = 0;
 }
 
+function createDiagnostics({
+  baselineState,
+  leftKneeAngle,
+  rightKneeAngle,
+  leanOffset,
+  shoulderWidth,
+  confidence
+}) {
+  return {
+    neutralFrames: baselineState.neutralFrames,
+    baselineReady: baselineState.ready,
+    leftKneeAngle,
+    rightKneeAngle,
+    leanRatio: shoulderWidth > 0 ? leanOffset / shoulderWidth : 0,
+    confidence
+  };
+}
+
 export function createMotionClassifier() {
   const baselineState = {
     ready: false,
@@ -137,7 +184,8 @@ export function createMotionClassifier() {
         confidence: 0,
         landmarks: [],
         poseDetected: false,
-        status: "no_pose"
+        status: "no_pose",
+        diagnostics: null
       };
     }
 
@@ -149,7 +197,8 @@ export function createMotionClassifier() {
         confidence: 0.1,
         landmarks,
         poseDetected: false,
-        status: "partial_pose"
+        status: "partial_pose",
+        diagnostics: null
       };
     }
 
@@ -161,11 +210,11 @@ export function createMotionClassifier() {
     const leftKneeAngle = angleDegrees(points.leftHip, points.leftKnee, points.leftAnkle);
     const rightKneeAngle = angleDegrees(points.rightHip, points.rightKnee, points.rightAnkle);
     const leftArmUp =
-      points.leftWrist.y < points.leftShoulder.y - torsoHeight * 0.18 &&
-      points.leftElbow.y < points.leftShoulder.y + torsoHeight * 0.1;
+      points.leftWrist.y < points.leftShoulder.y - torsoHeight * MOTION_THRESHOLDS.arms.wristLiftFactor &&
+      points.leftElbow.y < points.leftShoulder.y + torsoHeight * MOTION_THRESHOLDS.arms.elbowLiftFactor;
     const rightArmUp =
-      points.rightWrist.y < points.rightShoulder.y - torsoHeight * 0.18 &&
-      points.rightElbow.y < points.rightShoulder.y + torsoHeight * 0.1;
+      points.rightWrist.y < points.rightShoulder.y - torsoHeight * MOTION_THRESHOLDS.arms.wristLiftFactor &&
+      points.rightElbow.y < points.rightShoulder.y + torsoHeight * MOTION_THRESHOLDS.arms.elbowLiftFactor;
     const leanOffset = points.nose.x - hipCenter.x;
     const hipLift = baselineState.ready ? baselineState.hipY - hipCenter.y : 0;
     const ankleLift = baselineState.ready ? baselineState.ankleY - ankleCenter.y : 0;
@@ -175,9 +224,9 @@ export function createMotionClassifier() {
     const likelyNeutral =
       !leftArmUp &&
       !rightArmUp &&
-      leftKneeAngle > 145 &&
-      rightKneeAngle > 145 &&
-      Math.abs(leanOffset) < shoulderWidth * 0.12;
+      leftKneeAngle > MOTION_THRESHOLDS.neutral.kneeMinAngle &&
+      rightKneeAngle > MOTION_THRESHOLDS.neutral.kneeMinAngle &&
+      Math.abs(leanOffset) < shoulderWidth * MOTION_THRESHOLDS.neutral.leanLimitFactor;
 
     if (likelyNeutral) {
       updateBaseline(points, baselineState);
@@ -191,66 +240,184 @@ export function createMotionClassifier() {
       baselineCalibrated &&
       !leftArmUp &&
       !rightArmUp &&
-      Math.abs(leanOffset) < shoulderWidth * 0.18 &&
-      leftKneeAngle > 150 &&
-      rightKneeAngle > 150 &&
-      shoulderLift > baselineState.torsoHeight * 0.1 &&
-      hipLift > baselineState.torsoHeight * 0.16 &&
-      ankleLift > baselineState.torsoHeight * 0.08;
+      Math.abs(leanOffset) < shoulderWidth * MOTION_THRESHOLDS.jump.leanLimitFactor &&
+      leftKneeAngle > MOTION_THRESHOLDS.jump.kneeMinAngle &&
+      rightKneeAngle > MOTION_THRESHOLDS.jump.kneeMinAngle &&
+      shoulderLift > baselineState.torsoHeight * MOTION_THRESHOLDS.jump.shoulderLiftFactor &&
+      hipLift > baselineState.torsoHeight * MOTION_THRESHOLDS.jump.hipLiftFactor &&
+      ankleLift > baselineState.torsoHeight * MOTION_THRESHOLDS.jump.ankleLiftFactor;
     const squatReady =
       !leftArmUp &&
       !rightArmUp &&
-      leftKneeAngle < 118 &&
-      rightKneeAngle < 118 &&
+      leftKneeAngle < MOTION_THRESHOLDS.squat.kneeMaxAngle &&
+      rightKneeAngle < MOTION_THRESHOLDS.squat.kneeMaxAngle &&
       (!baselineCalibrated ||
-        (hipDrop > baselineState.torsoHeight * 0.14 &&
-          ankleDrop < baselineState.torsoHeight * 0.08 &&
-          Math.abs(leanOffset) < shoulderWidth * 0.22));
+        (hipDrop > baselineState.torsoHeight * MOTION_THRESHOLDS.squat.hipDropFactor &&
+          ankleDrop < baselineState.torsoHeight * MOTION_THRESHOLDS.squat.ankleDropFactor &&
+          Math.abs(leanOffset) < shoulderWidth * MOTION_THRESHOLDS.squat.leanLimitFactor));
+    const leanLeftReady = leanOffset < -shoulderWidth * MOTION_THRESHOLDS.lean.commitFactor;
+    const leanRightReady = leanOffset > shoulderWidth * MOTION_THRESHOLDS.lean.commitFactor;
 
     if (jumpReady) {
-      return { motionId: 7, confidence: 0.9, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (squatReady) {
-      return { motionId: 4, confidence: 0.86, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (leftArmUp && rightArmUp) {
-      return { motionId: 1, confidence: 0.88, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (leftArmUp && !rightArmUp) {
-      return { motionId: 2, confidence: 0.82, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (rightArmUp && !leftArmUp) {
-      return { motionId: 3, confidence: 0.82, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (leanOffset < -shoulderWidth * 0.2) {
-      return { motionId: 5, confidence: 0.72, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (leanOffset > shoulderWidth * 0.2) {
-      return { motionId: 6, confidence: 0.72, landmarks, poseDetected: true, status: "motion_ready" };
-    }
-
-    if (likelyNeutral && !baselineCalibrated) {
       return {
-        motionId: 0,
-        confidence: Math.max(0.45, baselineProgress),
+        motionId: 7,
+        confidence: 0.9,
         landmarks,
         poseDetected: true,
-        status: "calibrating"
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.9
+        })
       };
     }
 
+    if (squatReady) {
+      return {
+        motionId: 4,
+        confidence: 0.86,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.86
+        })
+      };
+    }
+
+    if (leftArmUp && rightArmUp) {
+      return {
+        motionId: 1,
+        confidence: 0.88,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.88
+        })
+      };
+    }
+
+    if (leftArmUp && !rightArmUp) {
+      return {
+        motionId: 2,
+        confidence: 0.82,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.82
+        })
+      };
+    }
+
+    if (rightArmUp && !leftArmUp) {
+      return {
+        motionId: 3,
+        confidence: 0.82,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.82
+        })
+      };
+    }
+
+    if (leanLeftReady) {
+      return {
+        motionId: 5,
+        confidence: 0.74,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.74
+        })
+      };
+    }
+
+    if (leanRightReady) {
+      return {
+        motionId: 6,
+        confidence: 0.74,
+        landmarks,
+        poseDetected: true,
+        status: "motion_ready",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence: 0.74
+        })
+      };
+    }
+
+    if (likelyNeutral && !baselineCalibrated) {
+      const confidence = Math.max(0.45, baselineProgress);
+      return {
+        motionId: 0,
+        confidence,
+        landmarks,
+        poseDetected: true,
+        status: "calibrating",
+        diagnostics: createDiagnostics({
+          baselineState,
+          leftKneeAngle,
+          rightKneeAngle,
+          leanOffset,
+          shoulderWidth,
+          confidence
+        })
+      };
+    }
+
+    const confidence = likelyNeutral ? 0.75 : 0.35;
     return {
       motionId: 0,
-      confidence: likelyNeutral ? 0.75 : 0.35,
+      confidence,
       landmarks,
       poseDetected: true,
-      status: likelyNeutral ? "neutral_ready" : "holding"
+      status: likelyNeutral ? "neutral_ready" : "holding",
+      diagnostics: createDiagnostics({
+        baselineState,
+        leftKneeAngle,
+        rightKneeAngle,
+        leanOffset,
+        shoulderWidth,
+        confidence
+      })
     };
   }
 

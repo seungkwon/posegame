@@ -10,6 +10,7 @@ import {
   TARGET_FPS
 } from "../lib/game";
 import { createPoseEngine } from "../lib/poseEngine";
+import { MOTION_THRESHOLDS } from "../lib/poseClassifier";
 
 const PREVIEW_MOTION_MS = 1100;
 const PREVIEW_GAP_MS = 250;
@@ -62,6 +63,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   const [detectionStatus, setDetectionStatus] = useState("no_pose");
   const [confidence, setConfidence] = useState(0);
   const [requiredConfidence, setRequiredConfidence] = useState(0);
+  const [diagnostics, setDiagnostics] = useState(null);
 
   function describeDetectionStatus(status, isConfident) {
     if (status === "no_pose") return "Looking for a full body pose.";
@@ -110,7 +112,8 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         confidence: nextConfidence,
         requiredConfidence: nextRequiredConfidence,
         status,
-        isConfident
+        isConfident,
+        diagnostics: nextDiagnostics
       }) => {
         setFps(nextFps);
         setPoseDetected(nextPoseDetected);
@@ -118,6 +121,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
         setDetectionStatus(describeDetectionStatus(status, isConfident));
         setConfidence(nextConfidence);
         setRequiredConfidence(nextRequiredConfidence);
+        setDiagnostics(nextDiagnostics);
       }
     });
 
@@ -300,6 +304,29 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
               Status: {detectionStatus} / Confidence {confidence.toFixed(2)} / Threshold{" "}
               {requiredConfidence.toFixed(2)}
             </small>
+          </div>
+
+          <div className="tuning-card">
+            <div className="panel-header">
+              <div>
+                <p className="eyebrow">Tuning</p>
+                <h3>Live Threshold Snapshot</h3>
+              </div>
+              <span className="tag">For playtest calibration</span>
+            </div>
+            <div className="tuning-grid">
+              <span>Neutral knees &gt; {MOTION_THRESHOLDS.neutral.kneeMinAngle}deg</span>
+              <span>Jump knees &gt; {MOTION_THRESHOLDS.jump.kneeMinAngle}deg</span>
+              <span>Squat knees &lt; {MOTION_THRESHOLDS.squat.kneeMaxAngle}deg</span>
+              <span>Lean trigger {MOTION_THRESHOLDS.lean.commitFactor.toFixed(2)} shoulder widths</span>
+              <span>
+                Baseline {diagnostics?.neutralFrames ?? 0} / 6 {diagnostics?.baselineReady ? "ready" : "building"}
+              </span>
+              <span>Live confidence {diagnostics?.confidence?.toFixed(2) ?? "0.00"}</span>
+              <span>Left knee {diagnostics?.leftKneeAngle?.toFixed(1) ?? "--"}deg</span>
+              <span>Right knee {diagnostics?.rightKneeAngle?.toFixed(1) ?? "--"}deg</span>
+              <span>Lean ratio {diagnostics?.leanRatio?.toFixed(2) ?? "0.00"}</span>
+            </div>
           </div>
 
           {phase === "countdown" ? (
