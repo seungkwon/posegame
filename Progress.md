@@ -143,9 +143,18 @@
   - Added `backend/.env` and `frontend/.vite/` to ignored local artifacts.
   - Added `REPO_HOUSEKEEPING.md` to record the cleanup that landed and a short low-risk future backlog.
 
+## Milestone 20. Define the next product-facing milestone set
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Shifted the next cycle away from repository-only maintenance and toward real user validation.
+  - Added `USER_TEST_PLAN.md` with participant profile, moderator checklist, tasks, metrics, and a notes template.
+  - Established user testing as the next concrete product-facing step.
+
 ## Next milestone
 
-- Milestone 20. Decide whether to stop or define a new product-facing milestone set
+- Milestone 21. Run first-round user tests and collect findings
 - Goal:
-  - Confirm whether the remaining work should stay in repository-maintenance mode or return to gameplay/product improvements.
-  - Leave a clean handoff point for the next development cycle.
+  - Use the new test plan with real participants.
+  - Turn observed friction points into a prioritized gameplay and UX backlog.
