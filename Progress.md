@@ -98,9 +98,18 @@
   - Documented camera permission expectations, localhost behavior, and input-gate status cues.
   - Updated `README.md`, `SETUP_CHECKLIST.md`, and `BOOTSTRAP.md` to link the frontend quickstart in onboarding paths.
 
+## Milestone 15. Review and consolidate onboarding docs
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Simplified `README.md` into a short entrypoint with fast commands and a documentation map.
+  - Refocused `BOOTSTRAP.md` on environment preparation and shared verification context.
+  - Trimmed `SETUP_CHECKLIST.md` into a clearer launch checklist with fewer repeated explanations.
+
 ## Next milestone
 
-- Milestone 15. Review and consolidate onboarding docs
+- Milestone 16. Add doc maintenance notes for future contributors
 - Goal:
-  - Reduce duplication across README, bootstrap, checklist, and quickstart documents.
-  - Leave a cleaner documentation structure for future milestones.
+  - Make the intended role of each onboarding document explicit.
+  - Reduce future drift as more setup notes are added.

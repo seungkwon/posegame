@@ -2,9 +2,7 @@
 
 Browser-based pose sequence memory game.
 
-Frontend uses React + Vite.
-Backend uses FastAPI.
-Persistence is PostgreSQL via Docker.
+Frontend uses React + Vite. Backend uses FastAPI. Persistence is PostgreSQL via Docker.
 
 ## Current scope
 
@@ -20,9 +18,9 @@ Persistence is PostgreSQL via Docker.
 - Real-time FPS display
 - Open resource attribution document
 
-## Run
+## Fast paths
 
-### One-command verification
+### Full verification
 
 ```powershell
 ./verify.ps1
@@ -33,9 +31,17 @@ Optional flags:
 - `./verify.ps1 -FrontendOnly`
 - `./verify.ps1 -BackendOnly`
 
-### Backend
+### Frontend dev server
 
-```bash
+```powershell
+cd frontend
+npm install
+npm run dev
+```
+
+### Backend dev server
+
+```powershell
 cd backend
 py -3.9 -m venv .venv
 .venv\Scripts\activate
@@ -44,73 +50,24 @@ copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
-Backend setup notes:
-
-- `.env.example` is meant for direct local runs against `localhost:5432`
-- `docker compose` overrides `DATABASE_URL` for the backend container and uses the `db` hostname instead
-- Check [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md) if you want a step-by-step startup checklist
-
 ### Backend smoke test
 
-```bash
+```powershell
 cd backend
 py -3.9 -m unittest tests.test_smoke
 ```
 
-### Backend API quickstart
+### Docker services
 
-See [`API_QUICKSTART.md`](API_QUICKSTART.md) for the shortest local path to:
-
-- start only the database
-- launch the backend
-- verify `/health`
-- create a sample user
-- save a sample result
-- fetch history
-
-### Docker
-
-```bash
+```powershell
 docker compose up --build
 ```
 
-### Frontend
+## Doc map
 
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-### Frontend quickstart
-
-See [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md) for the fastest local path to:
-
-- launch the UI
-- connect the webcam
-- confirm pose readiness
-- run one sample round
-- understand camera and input-gate status messages
-
-### Frontend smoke test
-
-```bash
-cd frontend
-npm run smoke
-npm run build
-```
-
-## Next steps
-
-- Tune motion thresholds for real users
-- Improve jump and squat stability
-- Add richer stage presentation animations
-
-## Documents
-
-- Open resource attribution: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
-- Progress log: [`Progress.md`](Progress.md)
-- Developer bootstrap: [`BOOTSTRAP.md`](BOOTSTRAP.md)
-- Setup checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)
-- API quickstart: [`API_QUICKSTART.md`](API_QUICKSTART.md)
-- Frontend quickstart: [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md)
+- Start here for machine setup: [`BOOTSTRAP.md`](BOOTSTRAP.md)
+- Use a step-by-step launch checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)
+- Validate backend manually: [`API_QUICKSTART.md`](API_QUICKSTART.md)
+- Validate frontend and camera flow manually: [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md)
+- See attribution notes: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
+- Track milestone history: [`Progress.md`](Progress.md)
