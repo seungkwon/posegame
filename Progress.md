@@ -42,9 +42,19 @@
   - Exposed the input-gate state in the gameplay status panel.
   - Verified the frontend build with `npm run build`.
 
+## Milestone 9. Add backend and frontend smoke-test coverage
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added a backend API smoke test covering health, login, result save, and history fetch flow.
+  - Added a frontend smoke script covering sequence helpers and a basic pose-classifier path.
+  - Documented the smoke-test commands in `README.md`.
+  - Verified `npm run smoke`, `npm run build`, and `py -3.9 -m unittest tests.test_smoke`.
+
 ## Next milestone
 
-- Milestone 9. Add backend and frontend smoke-test coverage
+- Milestone 10. Add a one-command verification workflow
 - Goal:
-  - Add lightweight automated checks for game flow and API contract regressions.
-  - Make milestone verification less dependent on manual browser checks.
+  - Provide a simple top-level command or script for common milestone checks.
+  - Reduce friction when running frontend and backend verification together.

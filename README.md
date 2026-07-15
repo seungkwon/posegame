@@ -33,6 +33,13 @@ copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
+### Backend smoke test
+
+```bash
+cd backend
+python -m unittest tests.test_smoke
+```
+
 ### Docker
 
 ```bash
@@ -45,6 +52,14 @@ docker compose up --build
 cd frontend
 npm install
 npm run dev
+```
+
+### Frontend smoke test
+
+```bash
+cd frontend
+npm run smoke
+npm run build
 ```
 
 ## Next steps
