@@ -134,9 +134,18 @@
   - Made `Progress.md` the explicit detailed milestone source of truth and `revision.md` the compact companion log.
   - Reduced the remaining dependency on encoding-sensitive legacy note viewing.
 
+## Milestone 19. Review repository housekeeping opportunities
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Simplified `.gitignore` with broader cache and local-environment rules.
+  - Added `backend/.env` and `frontend/.vite/` to ignored local artifacts.
+  - Added `REPO_HOUSEKEEPING.md` to record the cleanup that landed and a short low-risk future backlog.
+
 ## Next milestone
 
-- Milestone 19. Review repository housekeeping opportunities
+- Milestone 20. Decide whether to stop or define a new product-facing milestone set
 - Goal:
-  - Identify any low-risk cleanup work that improves maintainability without changing behavior.
-  - Leave a short prioritized list or complete an obvious cleanup if it is small enough.
+  - Confirm whether the remaining work should stay in repository-maintenance mode or return to gameplay/product improvements.
+  - Leave a clean handoff point for the next development cycle.
