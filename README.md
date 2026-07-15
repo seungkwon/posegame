@@ -69,5 +69,6 @@ docker compose up --build
 - Use a step-by-step launch checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)
 - Validate backend manually: [`API_QUICKSTART.md`](API_QUICKSTART.md)
 - Validate frontend and camera flow manually: [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md)
+- See doc maintenance rules: [`DOCS_MAINTENANCE.md`](DOCS_MAINTENANCE.md)
 - See attribution notes: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
 - Track milestone history: [`Progress.md`](Progress.md)

@@ -8,6 +8,7 @@ Use this document to prepare a local machine before following the quickstarts.
 - [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md): bring-up checklist
 - [`API_QUICKSTART.md`](API_QUICKSTART.md): backend manual sanity check
 - [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md): frontend and camera sanity check
+- [`DOCS_MAINTENANCE.md`](DOCS_MAINTENANCE.md): update boundaries for onboarding docs
 
 ## Recommended toolchain
 

@@ -107,9 +107,18 @@
   - Refocused `BOOTSTRAP.md` on environment preparation and shared verification context.
   - Trimmed `SETUP_CHECKLIST.md` into a clearer launch checklist with fewer repeated explanations.
 
+## Milestone 16. Add doc maintenance notes for future contributors
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added `DOCS_MAINTENANCE.md` to define the role and boundaries of each onboarding document.
+  - Linked the maintenance guide from `README.md` and `BOOTSTRAP.md`.
+  - Documented simple update rules to reduce future duplication and drift.
+
 ## Next milestone
 
-- Milestone 16. Add doc maintenance notes for future contributors
+- Milestone 17. Review remaining project docs for encoding and consistency
 - Goal:
-  - Make the intended role of each onboarding document explicit.
-  - Reduce future drift as more setup notes are added.
+  - Clean up older planning or revision documents that still have poor readability.
+  - Leave the repository docs in a more consistently maintainable state.
