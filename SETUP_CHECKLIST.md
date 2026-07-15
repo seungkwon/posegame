@@ -22,6 +22,7 @@ Use this checklist when bringing up the project on a new machine or after resett
 - Install frontend dependencies with `npm install` inside `frontend`
 - Start the frontend with `npm run dev`
 - Confirm the app is reachable at `http://localhost:5173`
+- Optionally run through [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md) to verify webcam permission and one sample round
 
 ## Verification checklist
 

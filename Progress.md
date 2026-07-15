@@ -89,9 +89,18 @@
   - Updated `README.md`, `SETUP_CHECKLIST.md`, and `BOOTSTRAP.md` to link the quickstart in the right onboarding spots.
   - Clarified the fastest manual path to confirm backend health after local startup.
 
+## Milestone 14. Add frontend local quickstart and camera readiness notes
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Added `FRONTEND_QUICKSTART.md` with a short flow for local UI startup, camera connection, pose readiness, and one sample round.
+  - Documented camera permission expectations, localhost behavior, and input-gate status cues.
+  - Updated `README.md`, `SETUP_CHECKLIST.md`, and `BOOTSTRAP.md` to link the frontend quickstart in onboarding paths.
+
 ## Next milestone
 
-- Milestone 14. Add frontend local quickstart and camera readiness notes
+- Milestone 15. Review and consolidate onboarding docs
 - Goal:
-  - Make frontend bring-up and webcam prerequisites easier to verify.
-  - Reduce first-run confusion around camera permissions and MediaPipe startup.
+  - Reduce duplication across README, bootstrap, checklist, and quickstart documents.
+  - Leave a cleaner documentation structure for future milestones.

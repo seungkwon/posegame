@@ -82,6 +82,16 @@ npm install
 npm run dev
 ```
 
+### Frontend quickstart
+
+See [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md) for the fastest local path to:
+
+- launch the UI
+- connect the webcam
+- confirm pose readiness
+- run one sample round
+- understand camera and input-gate status messages
+
 ### Frontend smoke test
 
 ```bash
@@ -103,3 +113,4 @@ npm run build
 - Developer bootstrap: [`BOOTSTRAP.md`](BOOTSTRAP.md)
 - Setup checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)
 - API quickstart: [`API_QUICKSTART.md`](API_QUICKSTART.md)
+- Frontend quickstart: [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md)

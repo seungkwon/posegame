@@ -73,9 +73,14 @@ py -3.9 -m unittest tests.test_smoke
 
 Follow [`API_QUICKSTART.md`](API_QUICKSTART.md) if you want to confirm the live API flow manually after the backend starts.
 
+### Frontend sanity check by hand
+
+Follow [`FRONTEND_QUICKSTART.md`](FRONTEND_QUICKSTART.md) if you want to confirm camera readiness and the first playable round manually.
+
 ## Troubleshooting
 
 - If backend imports fail with missing `fastapi` or `starlette`, check that you installed requirements for the same Python version you are using to run tests.
 - If the backend starts but cannot connect to PostgreSQL, compare `backend\.env` with `docker-compose.yml` and make sure you are using the correct host for your run mode.
 - If `verify.ps1` is blocked by execution policy, run it with `powershell -ExecutionPolicy Bypass -File .\verify.ps1`.
 - If frontend verification fails immediately, run `npm install` in `frontend` first.
+- If the frontend loads but camera input never starts, re-check browser camera permission and confirm the full body is visible in frame.
