@@ -71,9 +71,18 @@
   - Documented the Python 3.9 requirement for backend smoke-test consistency.
   - Updated `README.md` to link the bootstrap guide and align backend setup commands with the tested interpreter.
 
+## Milestone 12. Add API environment example and setup checklist
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Expanded `backend/.env.example` with `APP_NAME` and clear notes about local versus Docker database usage.
+  - Added `SETUP_CHECKLIST.md` covering backend, frontend, and verification startup steps.
+  - Updated `README.md` and `BOOTSTRAP.md` to link the new checklist and clarify `.env` expectations.
+
 ## Next milestone
 
-- Milestone 12. Add API environment example and setup checklist
+- Milestone 13. Add backend health and local API quickstart notes
 - Goal:
-  - Make backend startup requirements more explicit for new contributors.
-  - Reduce ambiguity around `.env` creation and local database expectations.
+  - Make the API startup and sanity-check sequence easier to follow.
+  - Document the smallest set of commands needed to confirm the backend is healthy.

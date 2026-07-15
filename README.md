@@ -44,6 +44,12 @@ copy .env.example .env
 uvicorn app.main:app --reload
 ```
 
+Backend setup notes:
+
+- `.env.example` is meant for direct local runs against `localhost:5432`
+- `docker compose` overrides `DATABASE_URL` for the backend container and uses the `db` hostname instead
+- Check [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md) if you want a step-by-step startup checklist
+
 ### Backend smoke test
 
 ```bash
@@ -84,3 +90,4 @@ npm run build
 - Open resource attribution: [`OPEN_SOURCE_ATTRIBUTION.md`](OPEN_SOURCE_ATTRIBUTION.md)
 - Progress log: [`Progress.md`](Progress.md)
 - Developer bootstrap: [`BOOTSTRAP.md`](BOOTSTRAP.md)
+- Setup checklist: [`SETUP_CHECKLIST.md`](SETUP_CHECKLIST.md)

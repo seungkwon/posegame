@@ -40,6 +40,8 @@ py -3.9 -m pip install -r requirements.txt
 
 If you use a different interpreter for the virtual environment, keep the install and test commands on that same interpreter.
 
+After creating the backend environment, copy `backend\.env.example` to `backend\.env` and verify that the local `DATABASE_URL` matches the PostgreSQL instance you intend to use.
+
 ## Common verification commands
 
 ### Full verification from repo root
@@ -70,5 +72,6 @@ py -3.9 -m unittest tests.test_smoke
 ## Troubleshooting
 
 - If backend imports fail with missing `fastapi` or `starlette`, check that you installed requirements for the same Python version you are using to run tests.
+- If the backend starts but cannot connect to PostgreSQL, compare `backend\.env` with `docker-compose.yml` and make sure you are using the correct host for your run mode.
 - If `verify.ps1` is blocked by execution policy, run it with `powershell -ExecutionPolicy Bypass -File .\verify.ps1`.
 - If frontend verification fails immediately, run `npm install` in `frontend` first.
