@@ -116,9 +116,18 @@
   - Linked the maintenance guide from `README.md` and `BOOTSTRAP.md`.
   - Documented simple update rules to reduce future duplication and drift.
 
+## Milestone 17. Review remaining project docs for encoding and consistency
+
+- Status: Completed
+- Date: 2026-07-15
+- Summary:
+  - Replaced the hard-to-read legacy `요구사항.md` with a clean UTF-8 requirements document aligned to the current implementation.
+  - Replaced the unreadable legacy `계획.md` with a clearer project plan and implementation summary.
+  - Preserved the same high-level intent while making both files maintainable for future updates.
+
 ## Next milestone
 
-- Milestone 17. Review remaining project docs for encoding and consistency
+- Milestone 18. Normalize revision and legacy note docs
 - Goal:
-  - Clean up older planning or revision documents that still have poor readability.
-  - Leave the repository docs in a more consistently maintainable state.
+  - Review `revision.md` and any remaining older notes for consistency with the current documentation structure.
+  - Reduce the number of legacy files that still depend on encoding-sensitive viewing.
