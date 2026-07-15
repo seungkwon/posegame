@@ -66,6 +66,7 @@ export default function GameScreen({ user, onLogout, onSaveResult, onShowHistory
   function describeDetectionStatus(status, isConfident) {
     if (status === "no_pose") return "Looking for a full body pose.";
     if (status === "partial_pose") return "Move fully into frame so the camera can see your body.";
+    if (status === "calibrating") return "Hold a neutral pose for a moment so jump and squat can calibrate.";
     if (status === "neutral_ready") return "Neutral pose confirmed. You can enter the next move.";
     if (status === "holding") return "Hold the pose a little longer for a stable read.";
     if (status === "motion_ready" && !isConfident) return "Motion detected, but confidence is still building.";

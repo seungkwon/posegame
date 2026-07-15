@@ -15,15 +15,16 @@ const LANDMARK = {
 };
 
 const VISIBILITY_THRESHOLD = 0.55;
+const BASELINE_NEUTRAL_FRAMES = 6;
 const MOTION_CONFIDENCE = {
   0: 0.55,
   1: 0.78,
   2: 0.76,
   3: 0.76,
-  4: 0.8,
+  4: 0.82,
   5: 0.68,
   6: 0.68,
-  7: 0.84
+  7: 0.88
 };
 
 function isVisible(point) {
@@ -93,31 +94,44 @@ function updateBaseline(points, baselineState) {
   const hipCenter = midpoint(points.leftHip, points.rightHip);
   const ankleCenter = midpoint(points.leftAnkle, points.rightAnkle);
   const torsoHeight = Math.max(0.12, hipCenter.y - shoulderCenter.y);
-  const alpha = 0.1;
+  const alpha = baselineState.ready ? 0.1 : 0.2;
 
-  if (!baselineState.ready) {
+  baselineState.neutralFrames += 1;
+
+  if (baselineState.neutralFrames === 1) {
     baselineState.hipY = hipCenter.y;
     baselineState.ankleY = ankleCenter.y;
+    baselineState.shoulderY = shoulderCenter.y;
     baselineState.torsoHeight = torsoHeight;
-    baselineState.ready = true;
-    return;
+  } else {
+    baselineState.hipY = baselineState.hipY * (1 - alpha) + hipCenter.y * alpha;
+    baselineState.ankleY = baselineState.ankleY * (1 - alpha) + ankleCenter.y * alpha;
+    baselineState.shoulderY = baselineState.shoulderY * (1 - alpha) + shoulderCenter.y * alpha;
+    baselineState.torsoHeight = baselineState.torsoHeight * (1 - alpha) + torsoHeight * alpha;
   }
 
-  baselineState.hipY = baselineState.hipY * (1 - alpha) + hipCenter.y * alpha;
-  baselineState.ankleY = baselineState.ankleY * (1 - alpha) + ankleCenter.y * alpha;
-  baselineState.torsoHeight = baselineState.torsoHeight * (1 - alpha) + torsoHeight * alpha;
+  if (baselineState.neutralFrames >= BASELINE_NEUTRAL_FRAMES) {
+    baselineState.ready = true;
+  }
+}
+
+function resetNeutralFrames(baselineState) {
+  baselineState.neutralFrames = 0;
 }
 
 export function createMotionClassifier() {
   const baselineState = {
     ready: false,
+    neutralFrames: 0,
     hipY: 0,
     ankleY: 0,
+    shoulderY: 0,
     torsoHeight: 0
   };
 
   function classify(landmarks) {
     if (!landmarks?.length) {
+      resetNeutralFrames(baselineState);
       return {
         motionId: 0,
         confidence: 0,
@@ -129,6 +143,7 @@ export function createMotionClassifier() {
 
     const points = getCorePoints(landmarks);
     if (!allCoreVisible(points)) {
+      resetNeutralFrames(baselineState);
       return {
         motionId: 0,
         confidence: 0.1,
@@ -154,7 +169,9 @@ export function createMotionClassifier() {
     const leanOffset = points.nose.x - hipCenter.x;
     const hipLift = baselineState.ready ? baselineState.hipY - hipCenter.y : 0;
     const ankleLift = baselineState.ready ? baselineState.ankleY - ankleCenter.y : 0;
-    const squatDepth = hipCenter.y - shoulderCenter.y;
+    const shoulderLift = baselineState.ready ? baselineState.shoulderY - shoulderCenter.y : 0;
+    const hipDrop = baselineState.ready ? hipCenter.y - baselineState.hipY : 0;
+    const ankleDrop = baselineState.ready ? ankleCenter.y - baselineState.ankleY : 0;
     const likelyNeutral =
       !leftArmUp &&
       !rightArmUp &&
@@ -164,22 +181,38 @@ export function createMotionClassifier() {
 
     if (likelyNeutral) {
       updateBaseline(points, baselineState);
+    } else {
+      resetNeutralFrames(baselineState);
     }
 
-    if (
-      baselineState.ready &&
-      hipLift > baselineState.torsoHeight * 0.22 &&
-      ankleLift > baselineState.torsoHeight * 0.12
-    ) {
+    const baselineCalibrated = baselineState.ready;
+    const baselineProgress = baselineState.neutralFrames / BASELINE_NEUTRAL_FRAMES;
+    const jumpReady =
+      baselineCalibrated &&
+      !leftArmUp &&
+      !rightArmUp &&
+      Math.abs(leanOffset) < shoulderWidth * 0.18 &&
+      leftKneeAngle > 150 &&
+      rightKneeAngle > 150 &&
+      shoulderLift > baselineState.torsoHeight * 0.1 &&
+      hipLift > baselineState.torsoHeight * 0.16 &&
+      ankleLift > baselineState.torsoHeight * 0.08;
+    const squatReady =
+      !leftArmUp &&
+      !rightArmUp &&
+      leftKneeAngle < 118 &&
+      rightKneeAngle < 118 &&
+      (!baselineCalibrated ||
+        (hipDrop > baselineState.torsoHeight * 0.14 &&
+          ankleDrop < baselineState.torsoHeight * 0.08 &&
+          Math.abs(leanOffset) < shoulderWidth * 0.22));
+
+    if (jumpReady) {
       return { motionId: 7, confidence: 0.9, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
-    if (
-      leftKneeAngle < 125 &&
-      rightKneeAngle < 125 &&
-      squatDepth > torsoHeight * 0.95
-    ) {
-      return { motionId: 4, confidence: 0.85, landmarks, poseDetected: true, status: "motion_ready" };
+    if (squatReady) {
+      return { motionId: 4, confidence: 0.86, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
     if (leftArmUp && rightArmUp) {
@@ -202,14 +235,22 @@ export function createMotionClassifier() {
       return { motionId: 6, confidence: 0.72, landmarks, poseDetected: true, status: "motion_ready" };
     }
 
-    const shouldReset = likelyNeutral && baselineState.ready;
+    if (likelyNeutral && !baselineCalibrated) {
+      return {
+        motionId: 0,
+        confidence: Math.max(0.45, baselineProgress),
+        landmarks,
+        poseDetected: true,
+        status: "calibrating"
+      };
+    }
 
     return {
       motionId: 0,
       confidence: likelyNeutral ? 0.75 : 0.35,
       landmarks,
       poseDetected: true,
-      status: shouldReset ? "neutral_ready" : "holding"
+      status: likelyNeutral ? "neutral_ready" : "holding"
     };
   }
 
